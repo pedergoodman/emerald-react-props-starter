@@ -1,13 +1,17 @@
 import {useEffect, useState} from 'react';
 import axios from 'axios';
-
 import './App.css';
+
+// import components
+import Header from '../Header/Header';
+import CreatureList from '../CreatureList/CreatureList';
+import CreatureForm from '../CreatureForm/CreatureForm';
+
 
 function App () {
  
   const [creatureList, setCreatureList] = useState([]);
-  const [newCreatureName, setNewCreatureName] = useState('');
-  const [newCreatureOrigin, setNewCreatureOrigin] = useState('');
+
 
   // Function to get the creatures from the server/database
   const fetchCreatures = () => {
@@ -29,23 +33,20 @@ function App () {
   }
 
   // Function to add a new creature to the database
-  const handleSubmit = (event) => {
-    event.preventDefault();
+  const addNewCreature = (newCreature) => {
 
     axios({
       method: 'POST',
       url: '/creature',
       data: {
-        name: newCreatureName,
-        origin: newCreatureOrigin
+        name: newCreature.name,
+        origin: newCreature.origin
       }
     })
       .then( (response) => {
         console.log('Response:', response);
         fetchCreatures();
-        //Clear Inputs & State
-        setNewCreatureName('');
-        setNewCreatureOrigin('')
+
       })
       .catch(function (error) {
         console.log('Error on add:', error);
@@ -58,27 +59,14 @@ function App () {
     fetchCreatures();
   }, [])
   
+
+  
   return (
     <div className="App">
-      <h2>Add Creature</h2>
-      <form onSubmit={handleSubmit}>
-        <label>Name:</label>
-        <input 
-          onChange={ (event) => setNewCreatureName(event.target.value) } 
-          value={newCreatureName}
-          />
-        <label>Origin:</label>
-        <input 
-          onChange={ (event) => setNewCreatureOrigin(event.target.value) } 
-          value={newCreatureOrigin}/>
-        <button type="submit">Add New Creature</button>
-      </form>
-      <h2>All Creatures</h2>
-      <ul>
-        {creatureList.map(creature => 
-         (<li key={creature.id}>{creature.name} is from {creature.origin}</li>)
-        )}
-      </ul>
+      <Header title="Add Creature"/>
+      <CreatureForm addNewCreature={addNewCreature} />
+      <Header title="All Creatures" />
+      <CreatureList creatureList={creatureList} />
     </div>
   );
 
